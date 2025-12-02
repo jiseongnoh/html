@@ -1,0 +1,420 @@
+<!-- Chosen Palette: AlphaSec Blue & Arbitrum Navy -->
+<!-- Application Structure Plan:
+    1. Header: Navigation
+    2. Hero: "Don't Bridge. Just Withdraw." Slogan
+    3. Problem (The Friction): Chart.js funnel visualization
+    4. Solution (Target UX): 4-Step Process Cards (Updated based on final proposal)
+    5. Architecture (The Mechanism): Interactive Simulation of Liquidity Solver
+    6. Strategy & Risk: Detailed breakdown of Arbitrum choice and Risk Mitigations
+-->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project ETH Express: Proposal Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; color: #1F2937; }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 300px;
+        }
+        
+        /* Flow Diagram Styling */
+        .flow-node {
+            transition: all 0.3s ease;
+            border: 2px solid #374151; /* gray-700 */
+        }
+        .flow-node.active {
+            border-color: #3B82F6;
+            background-color: #1E3A8A; /* dark blue */
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+            transform: scale(1.05);
+        }
+        .flow-arrow {
+            color: #6B7280;
+            transition: color 0.3s ease;
+        }
+        .flow-arrow.active {
+            color: #3B82F6;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-gray-900 tracking-tight">AlphaSec <span class="text-blue-600">ETH Express</span></span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#summary" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">개요</a>
+                    <a href="#problem" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">문제점</a>
+                    <a href="#solution" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">솔루션</a>
+                    <a href="#architecture" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">작동원리</a>
+                    <a href="#risk" class="text-gray-500 hover:text-blue-600 px-3 py-2 text-sm font-medium">전략/리스크</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="summary" class="bg-white">
+        <div class="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                <span class="block">Don't Bridge.</span>
+                <span class="block text-blue-600">Just Withdraw.</span>
+            </h1>
+            <p class="mt-4 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                Arbitrum에서 AlphaSec으로의 <strong>ETH 직통 입금(Direct Deposit)</strong> 시스템.<br>
+                복잡한 브릿지 과정을 "출금" 한 번으로 대체합니다.
+            </p>
+            <div class="mt-8 flex justify-center gap-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">Target: Only ETH</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">Base: Arbitrum One</span>
+            </div>
+            <div class="mt-10">
+                <a href="#architecture" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-lg transition transform hover:-translate-y-1">
+                    시스템 시뮬레이션 보기
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Problem Section -->
+    <section id="problem" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-blue-600 font-semibold tracking-wide uppercase">The Problem</h2>
+                <p class="mt-2 text-3xl font-extrabold text-gray-900">왜 유저들은 AlphaSec에 도달하지 못하는가?</p>
+                <p class="mt-4 max-w-2xl text-lg text-gray-500 mx-auto">현재의 4단계 진입 장벽은 90% 이상의 잠재 유저 이탈을 초래합니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-red-500">
+                        <h3 class="text-lg font-bold text-gray-900">1. High Friction (복잡성)</h3>
+                        <p class="text-gray-600 mt-1">CEX → 지갑 → L1 브릿지 → L2 브릿지... 일반 유저는 이 과정을 견디지 못합니다.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
+                        <h3 class="text-lg font-bold text-gray-900">2. Missing Link (ETH 경로 부재)</h3>
+                        <p class="text-gray-600 mt-1">USDT는 직통 채널이 있지만, 핵심 자산인 ETH를 가져올 쉬운 방법이 전무합니다.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-gray-500">
+                        <h3 class="text-lg font-bold text-gray-900">3. Dead End (가스비)</h3>
+                        <p class="text-gray-600 mt-1">어렵게 WETH를 가져와도 가스비(KAIA)가 없어 아무것도 못하는 상황이 발생합니다.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h4 class="text-center font-bold text-gray-700 mb-4">현재 온보딩 퍼널 (예상)</h4>
+                    <div class="chart-container">
+                        <canvas id="frictionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section id="solution" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-blue-600 font-semibold tracking-wide uppercase">The Solution</h2>
+                <p class="mt-2 text-3xl font-extrabold text-gray-900">Liquidity Solver 기반 "원클릭 입금"</p>
+                <p class="mt-4 text-gray-500">Abstract 체인 모델을 벤치마킹하여 사용자 경험을 혁신합니다.</p>
+            </div>
+
+            <!-- 4-Step Process Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 relative">
+                    <div class="absolute -top-3 -left-3 bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
+                    <h3 class="font-bold text-blue-900 text-lg mb-2">지갑 연결</h3>
+                    <p class="text-sm text-blue-800">AlphaSec 접속 후 지갑을 연결하여 입금받을 <strong>최종 목적지(Destination)</strong>를 확정합니다.</p>
+                </div>
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 relative">
+                    <div class="absolute -top-3 -left-3 bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
+                    <h3 class="font-bold text-blue-900 text-lg mb-2">주소 발급</h3>
+                    <p class="text-sm text-blue-800">"ETH (Arbitrum)" 선택 시, 유저 지갑과 매핑된 <strong>1회용 입금 주소(Vault)</strong>가 생성됩니다.</p>
+                </div>
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 relative">
+                    <div class="absolute -top-3 -left-3 bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</div>
+                    <h3 class="font-bold text-blue-900 text-lg mb-2">단순 출금</h3>
+                    <p class="text-sm text-blue-800">유저는 업비트/바이낸스에서 해당 주소로 <strong>ETH를 출금</strong>합니다. (브릿지 UI 접속 X)</p>
+                </div>
+                <div class="bg-green-100 p-6 rounded-xl border border-green-200 relative shadow-md transform scale-105">
+                    <div class="absolute -top-3 -left-3 bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">4</div>
+                    <h3 class="font-bold text-green-900 text-lg mb-2">즉시 사용</h3>
+                    <p class="text-sm text-green-800">약 2분 후(Arbitrum 컨펌), <strong>Native ETH가 충전</strong>되어 즉시 거래 가능합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-16 bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-blue-400 font-semibold tracking-wide uppercase">System Architecture</h2>
+                <p class="mt-2 text-3xl font-extrabold">어떻게 작동하는가? (Mechanism)</p>
+                <p class="mt-4 text-gray-400">Solver(선지급)와 Stargate(후정산)의 조화</p>
+                <button onclick="runSimulation()" class="mt-8 px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-full font-bold transition shadow-lg animate-pulse">
+                    ▶ 프로세스 시뮬레이션 시작
+                </button>
+            </div>
+
+            <!-- Visual Diagram -->
+            <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-2xl relative overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
+                    
+                    <!-- Source Column -->
+                    <div class="space-y-8 flex flex-col items-center">
+                        <div id="node-user" class="flow-node bg-gray-700 w-full p-4 rounded-lg text-center">
+                            <div class="text-3xl mb-2">👤</div>
+                            <h4 class="font-bold">User (CEX)</h4>
+                            <p class="text-xs text-gray-400">Arbitrum ETH 출금</p>
+                        </div>
+                        <div class="text-2xl text-gray-600">⬇</div>
+                        <div id="node-vault" class="flow-node bg-gray-700 w-full p-4 rounded-lg text-center">
+                            <div class="text-3xl mb-2">🏦</div>
+                            <h4 class="font-bold">Vault Address</h4>
+                            <p class="text-xs text-gray-400">수취 확인 & 대기</p>
+                        </div>
+                    </div>
+
+                    <!-- Backend Column -->
+                    <div class="space-y-8 flex flex-col items-center justify-center relative">
+                        <!-- Solver Path (Fast) -->
+                        <div id="arrow-detect" class="flow-arrow absolute top-10 left-0 w-full border-t-2 border-dashed border-gray-600 hidden md:block"></div>
+                        <div class="absolute top-6 bg-gray-800 px-2 text-xs text-gray-400 hidden md:block">감지 (Listener)</div>
+
+                        <div id="node-solver" class="flow-node bg-indigo-900 w-full p-5 rounded-lg border border-indigo-500 text-center relative z-20">
+                            <div class="text-3xl mb-2">⚡</div>
+                            <h4 class="font-bold text-indigo-300">Liquidity Solver</h4>
+                            <p class="text-xs text-indigo-200">AlphaSec L2 트레저리</p>
+                            <span class="inline-block mt-2 px-2 py-1 bg-indigo-800 rounded text-xs font-bold animate-pulse">Pre-Funding</span>
+                        </div>
+
+                        <!-- Settlement Path (Slow) -->
+                        <div class="text-2xl text-gray-600 mt-4">⬇</div>
+                        <div id="node-stargate" class="flow-node bg-gray-700 w-full p-4 rounded-lg text-center">
+                            <div class="text-3xl mb-2">🌉</div>
+                            <h4 class="font-bold">Stargate V2</h4>
+                            <p class="text-xs text-gray-400">Hydra Bridging (Async)</p>
+                        </div>
+                    </div>
+
+                    <!-- Destination Column -->
+                    <div class="space-y-8 flex flex-col items-center">
+                        <div id="node-wallet" class="flow-node bg-green-900 w-full p-4 rounded-lg border border-green-500 text-center transform scale-105">
+                            <div class="text-3xl mb-2">💰</div>
+                            <h4 class="font-bold text-green-300">User Wallet</h4>
+                            <p class="text-xs text-green-200">Native ETH 수령</p>
+                            <div id="success-badge" class="hidden mt-2 text-xs font-bold text-yellow-300">✨ 입금 완료!</div>
+                        </div>
+                        <div class="text-2xl text-gray-600">⬆</div>
+                        <div id="node-kaia" class="flow-node bg-gray-700 w-full p-4 rounded-lg text-center">
+                            <div class="text-3xl mb-2">🇰</div>
+                            <h4 class="font-bold">Kaia Network</h4>
+                            <p class="text-xs text-gray-400">자산 정규화 & Refill</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log Console -->
+                <div class="mt-8 bg-black bg-opacity-60 rounded p-4 font-mono text-sm text-green-400 h-32 overflow-y-auto border border-gray-700" id="sim-log">
+                    > 시스템 준비 완료.<br>> [시뮬레이션 시작] 버튼을 눌러주세요.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Strategy & Risk Section -->
+    <section id="risk" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-blue-600 font-semibold tracking-wide uppercase">Strategy & Risk</h2>
+                <p class="mt-2 text-3xl font-extrabold text-gray-900">전략적 선택 및 리스크 관리</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Why Arbitrum -->
+                <div class="bg-white p-8 rounded-xl shadow-sm">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-4">Why Arbitrum & Stargate?</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-green-500 text-xl mr-3">✓</span>
+                            <div>
+                                <strong class="text-gray-800">Cost Efficient</strong>
+                                <p class="text-sm text-gray-600">이더리움 메인넷 대비 수거(Sweeping) 가스비 95% 절감</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 text-xl mr-3">✓</span>
+                            <div>
+                                <strong class="text-gray-800">Max Coverage</strong>
+                                <p class="text-sm text-gray-600">바이낸스, 빗썸, 업비트 등 모든 주요 CEX 출금 지원</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 text-xl mr-3">✓</span>
+                            <div>
+                                <strong class="text-gray-800">Official Partner</strong>
+                                <p class="text-sm text-gray-600">Stargate Hydra는 Kaia 공식 브릿지로 안정성 확보</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Interactive Risk Cards -->
+                <div class="space-y-4">
+                    <!-- Card 1 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden group cursor-pointer" onclick="toggleRisk('risk1')">
+                        <div class="p-5 flex justify-between items-center bg-gray-50 group-hover:bg-blue-50 transition">
+                            <h4 class="font-bold text-gray-800">⚠️ 트래블 룰 (Travel Rule)</h4>
+                            <span class="text-gray-400">▼</span>
+                        </div>
+                        <div id="risk1" class="hidden p-5 border-t border-gray-100 text-sm text-gray-600 bg-white">
+                            <p class="mb-2"><strong class="text-red-500">Risk:</strong> 1회용 Vault 주소는 국내 거래소(업비트 등)의 '본인 계정 확인'이 불가능하여 100만원 이상 출금 시 반려될 수 있음.</p>
+                            <p><strong class="text-blue-600">Strategy:</strong> <span class="bg-blue-100 px-1 rounded">Two-Track 접근</span>. 글로벌 및 개인지갑 유저는 제한 없음. 국내 유저는 '소액 입금 권장' 캠페인 진행 및 고액은 기존 경로 안내.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden group cursor-pointer" onclick="toggleRisk('risk2')">
+                        <div class="p-5 flex justify-between items-center bg-gray-50 group-hover:bg-blue-50 transition">
+                            <h4 class="font-bold text-gray-800">💸 비용 구조 (Cost Model)</h4>
+                            <span class="text-gray-400">▼</span>
+                        </div>
+                        <div id="risk2" class="hidden p-5 border-t border-gray-100 text-sm text-gray-600 bg-white">
+                            <p class="mb-2"><strong class="text-red-500">Risk:</strong> Vault 수거 가스비, 브릿지 수수료, 환전 슬리피지 비용 발생.</p>
+                            <p><strong class="text-blue-600">Strategy:</strong> <strong>Phase 1:</strong> 초기 유저 확보를 위해 재단이 비용 전액 대납(Sponsorship).<br><strong>Phase 2:</strong> 트래픽 안정화 시 유저 입금액에서 실비 자동 차감(Deduction) 구조로 전환.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden group cursor-pointer" onclick="toggleRisk('risk3')">
+                        <div class="p-5 flex justify-between items-center bg-gray-50 group-hover:bg-blue-50 transition">
+                            <h4 class="font-bold text-gray-800">🔒 보안 및 자산 (Security)</h4>
+                            <span class="text-gray-400">▼</span>
+                        </div>
+                        <div id="risk3" class="hidden p-5 border-t border-gray-100 text-sm text-gray-600 bg-white">
+                            <p class="mb-2"><strong class="text-red-500">Risk:</strong> 다수의 임시 주소(Vault) 키 관리 및 가격 괴리(De-peg).</p>
+                            <p><strong class="text-blue-600">Strategy:</strong> Fireblocks 등 <strong>MPC 월렛</strong> 도입으로 키 관리 자동화. 환전 시 1~2% 안전 마진(Safety Margin) 적용.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-white border-t border-gray-200 mt-12 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-400">© 2025 AlphaSec Project Team. Confidential.</p>
+            <p class="text-sm text-gray-500 mt-2">Next Step: PoC Development on Arbitrum Sepolia</p>
+        </div>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // Chart.js
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('frictionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['CEX 출금', '브릿지 접속', 'L1 브릿징', 'L2 브릿징', '최종 유입'],
+                    datasets: [{
+                        label: '유저 잔존율 (%)',
+                        data: [100, 60, 40, 20, 10],
+                        backgroundColor: ['#E0E7FF', '#C7D2FE', '#818CF8', '#6366F1', '#EF4444'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
+                }
+            });
+        });
+
+        // Simulation Logic
+        function runSimulation() {
+            const log = document.getElementById('sim-log');
+            const nodes = {
+                user: document.getElementById('node-user'),
+                vault: document.getElementById('node-vault'),
+                solver: document.getElementById('node-solver'),
+                wallet: document.getElementById('node-wallet'),
+                stargate: document.getElementById('node-stargate'),
+                kaia: document.getElementById('node-kaia'),
+            };
+            const badge = document.getElementById('success-badge');
+
+            // Reset
+            Object.values(nodes).forEach(n => n.classList.remove('active'));
+            badge.classList.add('hidden');
+            log.innerHTML = "> 시뮬레이션 초기화...<br>";
+
+            setTimeout(() => {
+                log.innerHTML += "> [User] Arbitrum으로 1 ETH 전송 시작<br>";
+                nodes.user.classList.add('active');
+            }, 500);
+
+            setTimeout(() => {
+                nodes.vault.classList.add('active');
+                log.innerHTML += "> [System] Vault 주소 입금 감지 (Confirming...)<br>";
+            }, 1500);
+
+            setTimeout(() => {
+                nodes.solver.classList.add('active');
+                log.innerHTML += "> <span class='text-yellow-400'>[Solver] 유효성 확인! 즉시 선지급 실행 (Pre-Funding)</span><br>";
+            }, 2500);
+
+            setTimeout(() => {
+                nodes.wallet.classList.add('active');
+                badge.classList.remove('hidden');
+                log.innerHTML += "> <span class='text-green-400 font-bold'>[UX 완료] 유저 지갑 1 ETH 입금 완료 (대기시간 0)</span><br>";
+            }, 3500);
+
+            setTimeout(() => {
+                nodes.vault.classList.remove('active');
+                nodes.stargate.classList.add('active');
+                log.innerHTML += "> [Backend] Vault 자금 수거(Sweeping) -> Stargate 브릿징<br>";
+            }, 5000);
+
+            setTimeout(() => {
+                nodes.stargate.classList.remove('active');
+                nodes.kaia.classList.add('active');
+                nodes.solver.classList.remove('active'); // Refilled
+                log.innerHTML += "> [Backend] Kaia L1 도착 -> 정규화 -> Solver 리필 완료.<br>> 시뮬레이션 종료.";
+            }, 7000);
+        }
+
+        // Toggle Logic
+        function toggleRisk(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
