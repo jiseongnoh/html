@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project AlphaGate: Strategy Dashboard v17</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0B1120; color: #E2E8F0; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .card { 
+            background: rgba(30, 41, 59, 0.6); 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1); 
+            border-radius: 12px; 
+        }
+        .card-header { 
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1); 
+            padding: 16px 24px; 
+            background: rgba(15, 23, 42, 0.4); 
+            border-radius: 12px 12px 0 0; 
+        }
+        
+        .node-base { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #334155; background: #0F172A; }
+        
+        .node-active-fast { 
+            border-color: #3B82F6; 
+            background: linear-gradient(135deg, #1E3A8A, #1D4ED8);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); 
+            color: white; 
+            transform: scale(1.05);
+        }
+        
+        .node-active-slow { 
+            border-color: #F59E0B; 
+            background: linear-gradient(135deg, #78350F, #B45309);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); 
+            color: white; 
+        }
+
+        .chip { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
+        
+        .bg-grid-pattern {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Top Navigation -->
+    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded flex items-center justify-center text-white font-bold text-lg shadow-lg">α</div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight text-white">Project <span class="text-blue-400">AlphaGate</span></h1>
+                    <div class="text-[10px] text-slate-400 font-mono tracking-wider uppercase">Strategic Asset Gateway</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-900/30 text-blue-300 border border-blue-800">Strategy Deck v17.0</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-10 space-y-10">
+
+        <!-- 1. Executive Summary -->
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-5">
+            <div class="card p-5 border-l-4 border-blue-500 bg-slate-800/50">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Winning Concept</div>
+                <div class="text-xl font-bold text-white mt-1">Direct CEX In</div>
+                <div class="text-xs text-slate-500 mt-1">"The Next Hyperliquid"</div>
+            </div>
+            <div class="card p-5 border-l-4 border-indigo-500 bg-slate-800/50">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Friction Cut</div>
+                <div class="text-xl font-bold text-white mt-1">4 Steps → 1</div>
+                <div class="text-xs text-slate-500 mt-1">Zero-Click Experience</div>
+            </div>
+            <div class="card p-5 border-l-4 border-emerald-500 bg-slate-800/50">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Speed</div>
+                <div class="text-xl font-bold text-white mt-1">~30 sec</div>
+                <div class="text-xs text-slate-500 mt-1">Instant Solver Pre-fill</div>
+            </div>
+            <div class="card p-5 border-l-4 border-pink-500 bg-slate-800/50">
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Target Partner</div>
+                <div class="text-xl font-bold text-white mt-1">fun.xyz</div>
+                <div class="text-xs text-slate-500 mt-1">Web3 Checkout Leader</div>
+            </div>
+        </section>
+
+        <!-- 2. Market Lesson: Evolution of Onboarding (NEW SECTION) -->
+        <section class="card overflow-hidden">
+            <div class="card-header flex justify-between items-center bg-slate-900/80">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <span class="text-xl">📈</span>
+                    Market Insight: Why UX Wins (dYdX vs Hyperliquid)
+                </h3>
+            </div>
+            
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                    
+                    <!-- Arrow connecting columns -->
+                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-slate-700 -z-10 transform -translate-y-1/2"></div>
+
+                    <!-- Stage 1: dYdX -->
+                    <div class="group relative p-6 bg-slate-800 border border-slate-700 rounded-xl hover:border-red-500/50 transition opacity-60 hover:opacity-100">
+                        <div class="absolute -top-3 left-6 px-2 bg-slate-900 text-xs font-mono text-slate-500">GEN 1: The Island</div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-2xl grayscale group-hover:grayscale-0">🏝️</span>
+                            <h4 class="font-bold text-slate-300">dYdX (v4)</h4>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-400 mb-4">
+                            <li>❌ <strong>Cosmos AppChain:</strong> 별도 지갑 필수</li>
+                            <li>❌ <strong>High Friction:</strong> 복잡한 브릿징 과정</li>
+                            <li>❌ <strong>Siloed:</strong> 유동성이 섬에 갇힘</li>
+                        </ul>
+                        <div class="text-xs text-red-400 font-bold border-t border-slate-700 pt-2">Result: Market Share Loss</div>
+                    </div>
+
+                    <!-- Stage 2: Hyperliquid -->
+                    <div class="group relative p-6 bg-slate-800 border border-slate-600 rounded-xl hover:border-teal-500/50 transition transform hover:-translate-y-1">
+                        <div class="absolute -top-3 left-6 px-2 bg-slate-900 text-xs font-mono text-teal-500">GEN 2: The Bridge</div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-2xl">🌉</span>
+                            <h4 class="font-bold text-white">Hyperliquid</h4>
+                        </div>
+                        <ul class="space-y-2 text-xs text-slate-300 mb-4">
+                            <li>✅ <strong>Arb-Friendly:</strong> EVM 지갑 그대로 사용</li>
+                            <li>⚠️ <strong>Bridge Required:</strong> 입금 과정은 여전히 존재</li>
+                            <li>✅ <strong>Win Factor:</strong> dYdX보다 쉬운 접근성</li>
+                        </ul>
+                        <div class="text-xs text-teal-400 font-bold border-t border-slate-700 pt-2">Result: Market Leader (Current)</div>
+                    </div>
+
+                    <!-- Stage 3: AlphaGate -->
+                    <div class="group relative p-6 bg-gradient-to-br from-blue-900 to-indigo-900 border-2 border-blue-500 rounded-xl shadow-2xl shadow-blue-500/20 transform scale-105">
+                        <div class="absolute -top-3 left-6 px-2 bg-indigo-900 text-xs font-mono text-blue-300 border border-blue-500 rounded-full">GEN 3: The Gateway</div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-2xl animate-pulse">⚡</span>
+                            <h4 class="font-bold text-white">AlphaGate</h4>
+                        </div>
+                        <ul class="space-y-2 text-xs text-blue-100 mb-4">
+                            <li>🚀 <strong>Zero Friction:</strong> 브릿지 과정 완전 삭제</li>
+                            <li>🚀 <strong>Direct Deposit:</strong> CEX에서 바로 쏘면 도착</li>
+                            <li>🚀 <strong>Evolution:</strong> Hyperliquid를 넘어서는 UX</li>
+                        </ul>
+                        <div class="text-xs text-blue-300 font-bold border-t border-blue-500/30 pt-2">Target: The Next Standard</div>
+                    </div>
+
+                </div>
+                
+                <div class="mt-8 text-center bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <p class="text-sm text-slate-300">
+                        "Hyperliquid가 dYdX를 이긴 이유는 <strong>'접근성(Accessibility)'</strong>입니다. <br>
+                        AlphaGate는 <strong>'입금(Deposit)' 자체를 온보딩으로 만드는</strong> 진화된 모델로 시장을 선점합니다."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Proven Models (Benchmarks) -->
+        <section class="card overflow-hidden">
+            <div class="card-header flex justify-between items-center">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <span class="text-xl">🏆</span>
+                    Benchmarks: The Winning Combo
+                </h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-700 bg-slate-800/20">
+                
+                <!-- Abstract Chain -->
+                <div class="p-6 hover:bg-slate-800/50 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">⚡</span>
+                        <div>
+                            <h4 class="font-bold text-white">Abstract Chain</h4>
+                            <span class="text-[10px] text-emerald-400 font-mono">Business Model</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                        <strong>"Global Wallet"</strong> 개념을 도입하여 CEX에서 바로 입금받는 모델로 TVL을 폭발적으로 성장시킴. 우리가 지향하는 <strong>사업적 롤모델</strong>.
+                    </p>
+                    <div class="flex gap-2">
+                        <span class="chip bg-slate-700 text-slate-300">Deposit Address</span>
+                        <span class="chip bg-slate-700 text-slate-300">Seamless</span>
+                    </div>
+                </div>
+
+                <!-- fun.xyz -->
+                <div class="p-6 hover:bg-slate-800/50 transition">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">🦄</span>
+                        <div>
+                            <h4 class="font-bold text-white">fun.xyz</h4>
+                            <span class="text-[10px] text-pink-400 font-mono">Tech / UX Model</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed mb-3">
+                        <strong>"Web3 Checkout"</strong> 솔루션을 통해 복잡한 체인 선택과 가스비를 숨기는(Abstraction) 기술 보유. 우리가 도입해야 할 <strong>기술적 파트너</strong>.
+                    </p>
+                    <div class="flex gap-2">
+                        <span class="chip bg-slate-700 text-slate-300">Pre-funding</span>
+                        <span class="chip bg-slate-700 text-slate-300">Solver Network</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Strategic Linkage: Pop Tech -->
+        <section class="card overflow-hidden">
+            <div class="card-header bg-gradient-to-r from-blue-900/20 to-slate-900">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <span class="text-xl">🔗</span>
+                    Strategic Linkage: Pop Tech Gateway
+                </h3>
+                <span class="chip bg-blue-500/20 text-blue-300 border border-blue-500/50">Ecosystem Synergy</span>
+            </div>
+            
+            <div class="p-8 relative">
+                <div class="absolute inset-0 bg-grid-pattern opacity-30"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-center gap-4">
+                    <!-- Step 1 -->
+                    <div class="text-center p-4 bg-slate-800 border border-slate-600 rounded-xl w-48">
+                        <div class="text-2xl mb-2">🏦</div>
+                        <div class="font-bold text-white text-sm">Major CEX</div>
+                        <div class="text-[10px] text-slate-400 mt-1">Binance / Upbit</div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="hidden md:block w-16 h-0.5 bg-slate-600 relative">
+                        <div class="absolute right-0 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-600 rotate-45"></div>
+                    </div>
+                    <div class="md:hidden h-8 w-0.5 bg-slate-600"></div>
+
+                    <!-- Step 2: AlphaGate -->
+                    <div class="text-center p-6 bg-gradient-to-br from-blue-900 to-indigo-900 border border-blue-500 rounded-xl w-56 shadow-xl shadow-blue-900/30 transform scale-110 z-20">
+                        <div class="text-3xl mb-2 animate-pulse">⚡</div>
+                        <div class="font-bold text-white">AlphaGate</div>
+                        <div class="text-[10px] text-blue-200 mt-1 font-mono">Zero-Friction Layer</div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="hidden md:block w-16 h-0.5 bg-slate-600 relative">
+                        <div class="absolute right-0 -top-1 w-2 h-2 border-t-2 border-r-2 border-slate-600 rotate-45"></div>
+                    </div>
+                    <div class="md:hidden h-8 w-0.5 bg-slate-600"></div>
+
+                    <!-- Step 3: Pop Tech -->
+                    <div class="text-center p-4 bg-slate-800 border border-slate-600 rounded-xl w-48">
+                        <div class="text-2xl mb-2">📊</div>
+                        <div class="font-bold text-white text-sm">Pop Tech</div>
+                        <div class="text-[10px] text-slate-400 mt-1">Spot Market</div>
+                        <div class="mt-2 text-xs bg-green-900/30 text-green-400 border border-green-800 rounded px-2 py-1">Trade Instantly</div>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center text-sm text-slate-400">
+                    "AlphaGate는 단순한 브릿지가 아니라, <strong>Pop Tech의 오더북 유동성을 공급하는 핵심 파이프라인</strong>입니다."
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. System Architecture Simulation -->
+        <section class="card">
+            <div class="card-header flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-white">System Blueprint</h3>
+                    <p class="text-xs text-slate-400 mt-1 font-mono">MODEL: FAST LANE (SOLVER) + SLOW LANE (SETTLEMENT)</p>
+                </div>
+                <button onclick="runSimulation()" id="simBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg uppercase tracking-wider transition shadow-lg shadow-blue-900/50">
+                    ▶ Run Simulation
+                </button>
+            </div>
+            
+            <div class="p-8 bg-[#0B1120] relative overflow-hidden min-h-[500px]">
+                
+                <!-- Background Grid -->
+                <div class="absolute inset-0 bg-grid-pattern opacity-30"></div>
+                
+                <div class="relative z-10 max-w-5xl mx-auto h-[400px]">
+                    
+                    <!-- Labels -->
+                    <div class="absolute left-0 top-8 text-xs font-mono text-blue-400 font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span> FAST LANE (User UX)
+                    </div>
+                    <div class="absolute left-0 bottom-8 text-xs font-mono text-amber-600 font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-600"></span> SLOW LANE (System)
+                    </div>
+
+                    <!-- 1. Source -->
+                    <div id="node-cex" class="absolute top-16 left-0 w-48 p-4 rounded-xl node-base text-center">
+                        <div class="text-2xl mb-2">🏦</div>
+                        <div class="font-bold text-sm text-white">CEX / Arb</div>
+                        <div class="text-[10px] text-slate-400 font-mono">Withdrawal</div>
+                    </div>
+
+                    <!-- 2. Gateway Detection -->
+                    <div id="node-gateway" class="absolute top-16 left-[280px] w-48 p-4 rounded-xl node-base text-center">
+                        <div class="text-2xl mb-2">📡</div>
+                        <div class="font-bold text-sm text-white">Gateway</div>
+                        <div class="text-[10px] text-slate-400 font-mono">Deposit Detection</div>
+                    </div>
+
+                    <!-- 3. Signal Line -->
+                    <div id="signal-path" class="absolute top-8 left-[480px] w-[200px] h-[2px] border-t-2 border-dashed border-slate-600"></div>
+                    <div class="absolute top-2 left-[520px] px-2 py-1 bg-slate-900 text-[10px] text-slate-400 rounded border border-slate-700 font-mono">
+                        Trigger Signal
+                    </div>
+
+                    <!-- 4. Solver (Treasury) -->
+                    <div id="node-solver" class="absolute top-16 right-0 w-48 p-4 rounded-xl node-base text-center border-blue-500/30">
+                        <div class="text-2xl mb-2">⚡</div>
+                        <div class="font-bold text-sm text-blue-400">Solver Treasury</div>
+                        <div class="text-[10px] text-slate-400 font-mono">Pre-funding Layer</div>
+                    </div>
+
+                    <!-- 5. User Wallet -->
+                    <div id="node-user" class="absolute top-[200px] right-0 w-48 p-4 rounded-xl node-base text-center border-green-500/30">
+                        <div class="text-2xl mb-2">👤</div>
+                        <div class="font-bold text-sm text-green-400">User Wallet</div>
+                        <div class="text-[10px] text-slate-400 font-mono">Native ETH Credited</div>
+                        <div id="success-badge" class="hidden mt-2 px-2 py-1 bg-green-900/50 text-green-400 text-[10px] font-bold rounded border border-green-700">COMPLETED (30s)</div>
+                    </div>
+
+                    <!-- Slow Path Connection -->
+                    <div class="absolute top-[140px] left-[370px] h-[100px] w-[2px] border-l-2 border-dashed border-slate-700"></div>
+
+                    <!-- 6. Kaia L1 (Stargate) -->
+                    <div id="node-l1" class="absolute bottom-4 left-[280px] w-64 p-4 rounded-xl node-base text-center border-amber-900/30">
+                        <div class="text-2xl mb-2">🌉</div>
+                        <div class="font-bold text-sm text-amber-500">Kaia L1</div>
+                        <div class="text-[10px] text-slate-400 font-mono">Stargate V2 Settlement</div>
+                    </div>
+
+                    <!-- Refill Connector -->
+                    <div class="absolute bottom-[80px] left-[540px] w-[200px] h-[120px] border-b-2 border-r-2 border-dashed border-slate-700 rounded-br-3xl"></div>
+                    <div class="absolute bottom-[100px] right-[40px] px-2 py-1 bg-slate-900 text-[10px] text-emerald-500 rounded border border-slate-700">
+                        Liquidity Refill
+                    </div>
+                </div>
+
+                <!-- Console Log -->
+                <div class="absolute bottom-4 right-4 w-96 h-40 bg-black/80 border border-slate-700 rounded-lg p-3 overflow-hidden font-mono text-[10px]">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+                        <span class="text-slate-500 font-bold">SYSTEM_LOG</span>
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                        </div>
+                    </div>
+                    <div id="console-log" class="space-y-1 overflow-y-auto h-24 text-slate-300">
+                        <span class="text-slate-600">> System Ready. Waiting for simulation...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Execution Strategy -->
+        <section class="card overflow-hidden">
+            <div class="card-header flex justify-between items-center bg-slate-900/50">
+                <h3 class="font-bold text-white flex items-center gap-2">
+                    <span class="text-xl">🛠️</span>
+                    Execution: Partnership First
+                </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <div class="p-6 border-r border-slate-700/50 bg-blue-900/10">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <h4 class="font-bold text-white">Option A: fun.xyz (Priority)</h4>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">"Checkout" API 및 Solver SDK 통합 추진</p>
+                    <ul class="space-y-2 text-xs text-slate-300">
+                        <li>✅ <strong>Time-to-Market:</strong> 2주 내 도입 가능</li>
+                        <li>✅ <strong>Liquidity:</strong> 파트너사 유동성 활용 (리스크 ↓)</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-slate-900/20">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                        <h4 class="font-bold text-slate-400">Option B: In-house (Contingency)</h4>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">AlphaSec Treasury 기반 자체 Solver 구축</p>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li>✅ 수수료 수익 내부화</li>
+                        <li>⚠️ 개발 리소스(4-6주) 및 초기 유동성 부담</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-6 py-8 text-center border-t border-slate-800 mt-8">
+        <p class="text-slate-500 text-sm">Project AlphaGate Strategy Deck | Confidential</p>
+    </footer>
+
+    <script>
+        // 1. Simulation Logic
+        function runSimulation() {
+            const btn = document.getElementById('simBtn');
+            const log = document.getElementById('console-log');
+            const badge = document.getElementById('success-badge');
+            
+            const nodes = {
+                cex: document.getElementById('node-cex'),
+                gateway: document.getElementById('node-gateway'),
+                solver: document.getElementById('node-solver'),
+                user: document.getElementById('node-user'),
+                l1: document.getElementById('node-l1')
+            };
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            badge.classList.add('hidden');
+            log.innerHTML = '<span class="text-blue-400">> Init AlphaGate Protocol...</span>';
+            
+            Object.values(nodes).forEach(n => {
+                n.classList.remove('node-active-fast', 'node-active-slow');
+                n.classList.add('node-base');
+            });
+
+            const addLog = (msg, color = 'text-slate-300') => {
+                log.innerHTML += `<div class="${color}">${msg}</div>`;
+                log.scrollTop = log.scrollHeight;
+            };
+
+            // Fast Lane
+            setTimeout(() => {
+                nodes.cex.classList.add('node-active-fast');
+                addLog('> [User] Withdraw ETH from CEX', 'text-white');
+            }, 500);
+
+            setTimeout(() => {
+                nodes.cex.classList.remove('node-active-fast');
+                nodes.gateway.classList.add('node-active-fast');
+                addLog('> [Gateway] Incoming Deposit Detected', 'text-blue-400');
+            }, 1500);
+
+            setTimeout(() => {
+                nodes.solver.classList.add('node-active-fast');
+                addLog('> [Solver] <span class="text-blue-300">Triggering Instant Pre-fill...</span>', 'text-slate-400');
+            }, 2500);
+
+            setTimeout(() => {
+                nodes.user.classList.add('node-active-fast');
+                badge.classList.remove('hidden');
+                addLog('> [AlphaSec] ⚡ ASSET CREDITED (UX Complete)', 'text-green-400 font-bold');
+            }, 3500);
+
+            // Slow Lane
+            setTimeout(() => {
+                [nodes.gateway, nodes.solver, nodes.user].forEach(n => n.classList.remove('node-active-fast'));
+                addLog('> [System] Starting Async Settlement...', 'text-amber-500');
+                nodes.gateway.classList.add('node-active-slow');
+            }, 5000);
+
+            setTimeout(() => {
+                nodes.gateway.classList.remove('node-active-slow');
+                nodes.l1.classList.add('node-active-slow');
+                addLog('> [Stargate] Bridging via Kaia L1...', 'text-amber-400');
+            }, 6500);
+
+            setTimeout(() => {
+                nodes.l1.classList.remove('node-active-slow');
+                nodes.solver.classList.add('node-active-slow');
+                addLog('> [Refill] Solver Liquidity Replenished.', 'text-emerald-500');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }, 8000);
+        }
+    </script>
+</body>
+</html>
