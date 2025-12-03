@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project AlphaGate: Strategic Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; color: #0F172A; line-height: 1.5; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Layout */
+        .max-w-7xl { max-width: 80rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+        .space-y-20 > * + * { margin-top: 5rem; }
+        .space-y-12 > * + * { margin-top: 3rem; }
+        .space-y-8 > * + * { margin-top: 2rem; }
+        .space-y-6 > * + * { margin-top: 1.5rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-1 > * + * { margin-top: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-8 { gap: 2rem; }
+        
+        /* Flexbox & Grid */
+        .flex { display: flex; }
+        .inline-flex { display: inline-flex; }
+        .grid { display: grid; }
+        .items-center { align-items: center; }
+        .items-start { align-items: start; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .flex-wrap { flex-wrap: wrap; }
+        .text-center { text-align: center; }
+        
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .md\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        
+        /* Sizing */
+        .w-3 { width: 0.75rem; }
+        .w-8 { width: 2rem; }
+        .w-9 { width: 2.25rem; }
+        .w-10 { width: 2.5rem; }
+        .w-44 { width: 11rem; }
+        .w-48 { width: 12rem; }
+        .w-80 { width: 20rem; }
+        .w-full { width: 100%; }
+        .h-3 { height: 0.75rem; }
+        .h-8 { height: 2rem; }
+        .h-9 { height: 2.25rem; }
+        .h-10 { height: 2.5rem; }
+        .h-16 { height: 4rem; }
+        .h-24 { height: 6rem; }
+        .h-44 { height: 11rem; }
+        .h-80 { height: 20rem; }
+        .max-w-2xl { max-width: 42rem; }
+        .max-w-3xl { max-width: 48rem; }
+        .max-w-4xl { max-width: 56rem; }
+        .max-w-6xl { max-width: 72rem; }
+        
+        /* Typography */
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+        .text-5xl { font-size: 3rem; line-height: 1; }
+        .text-6xl { font-size: 3.75rem; line-height: 1; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .font-extrabold { font-weight: 800; }
+        .tracking-tight { letter-spacing: -0.025em; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .leading-tight { line-height: 1.25; }
+        .leading-relaxed { line-height: 1.625; }
+        .uppercase { text-transform: uppercase; }
+        .italic { font-style: italic; }
+        
+        /* Colors */
+        .text-white { color: #ffffff; }
+        .text-slate-300 { color: #cbd5e1; }
+        .text-slate-400 { color: #94a3b8; }
+        .text-slate-500 { color: #64748b; }
+        .text-slate-600 { color: #475569; }
+        .text-slate-700 { color: #334155; }
+        .text-slate-800 { color: #1e293b; }
+        .text-slate-900 { color: #0f172a; }
+        .text-blue-500 { color: #3b82f6; }
+        .text-blue-600 { color: #2563eb; }
+        .text-blue-700 { color: #1d4ed8; }
+        .text-pink-600 { color: #db2777; }
+        .text-pink-700 { color: #be185d; }
+        .text-emerald-600 { color: #059669; }
+        .text-emerald-700 { color: #047857; }
+        .text-green-600 { color: #16a34a; }
+        .text-green-700 { color: #15803d; }
+        .text-amber-600 { color: #d97706; }
+        .text-amber-700 { color: #b45309; }
+        .text-amber-800 { color: #92400e; }
+        .text-red-500 { color: #ef4444; }
+        .text-red-600 { color: #dc2626; }
+        .text-orange-600 { color: #ea580c; }
+        .text-purple-600 { color: #9333ea; }
+        .text-indigo-600 { color: #4f46e5; }
+        
+        .bg-white { background-color: #ffffff; }
+        .bg-slate-50 { background-color: #f8fafc; }
+        .bg-slate-100 { background-color: #f1f5f9; }
+        .bg-slate-200 { background-color: #e2e8f0; }
+        .bg-slate-900 { background-color: #0f172a; }
+        .bg-blue-50 { background-color: #eff6ff; }
+        .bg-blue-100 { background-color: #dbeafe; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-pink-50 { background-color: #fdf2f8; }
+        .bg-pink-100 { background-color: #fce7f3; }
+        .bg-emerald-50 { background-color: #ecfdf5; }
+        .bg-emerald-100 { background-color: #d1fae5; }
+        .bg-green-100 { background-color: #dcfce7; }
+        .bg-amber-100 { background-color: #fef3c7; }
+        .bg-red-50 { background-color: #fef2f2; }
+        .bg-red-100 { background-color: #fee2e2; }
+        .bg-purple-100 { background-color: #f3e8ff; }
+        .bg-indigo-600 { background-color: #4f46e5; }
+        
+        .bg-gradient-blue { background: linear-gradient(to right, #2563eb, #4f46e5); }
+        .bg-gradient-br-blue { background: linear-gradient(to bottom right, #eff6ff, #e0e7ff); }
+        .bg-gradient-br-amber { background: linear-gradient(to bottom right, #fffbeb, #fff7ed); }
+        .bg-gradient-br-pink { background: linear-gradient(to bottom right, #ffffff, rgba(253, 242, 248, 0.3)); }
+        .text-transparent { color: transparent; }
+        .bg-clip-text { -webkit-background-clip: text; background-clip: text; }
+        
+        /* Borders */
+        .border { border-width: 1px; }
+        .border-2 { border-width: 2px; }
+        .border-t { border-top-width: 1px; }
+        .border-t-4 { border-top-width: 4px; }
+        .border-b { border-bottom-width: 1px; }
+        .border-l-4 { border-left-width: 4px; }
+        .border-dashed { border-style: dashed; }
+        .border-slate-100 { border-color: #f1f5f9; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        .border-slate-300 { border-color: #cbd5e1; }
+        .border-slate-700 { border-color: #334155; }
+        .border-slate-800 { border-color: #1e293b; }
+        .border-blue-100 { border-color: #dbeafe; }
+        .border-blue-200 { border-color: #bfdbfe; }
+        .border-blue-500 { border-color: #3b82f6; }
+        .border-pink-500 { border-color: #ec4899; }
+        .border-emerald-500 { border-color: #10b981; }
+        .border-green-400 { border-color: #4ade80; }
+        .border-amber-100 { border-color: #fef3c7; }
+        .border-amber-200 { border-color: #fde68a; }
+        .border-amber-400 { border-color: #fbbf24; }
+        .border-red-100 { border-color: #fee2e2; }
+        .border-red-400 { border-color: #f87171; }
+        .border-purple-400 { border-color: #c084fc; }
+        .border-gray-100 { border-color: #f3f4f6; }
+        
+        .rounded { border-radius: 0.25rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-full { border-radius: 9999px; }
+        
+        /* Spacing */
+        .p-1 { padding: 0.25rem; }
+        .p-2 { padding: 0.5rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-5 { padding: 1.25rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .p-10 { padding: 2.5rem; }
+        .p-12 { padding: 3rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+        .pt-4 { padding-top: 1rem; }
+        .pb-2 { padding-bottom: 0.5rem; }
+        .pl-8 { padding-left: 2rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-8 { margin-top: 2rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .ml-28 { margin-left: 7rem; }
+        
+        /* Effects */
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+        .shadow-md { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .sticky { position: sticky; }
+        .top-0 { top: 0; }
+        .bottom-6 { bottom: 1.5rem; }
+        .left-6 { left: 1.5rem; }
+        .right-0 { right: 0; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .z-10 { z-index: 10; }
+        .z-20 { z-index: 20; }
+        .z-30 { z-index: 30; }
+        .z-40 { z-index: 40; }
+        .z-50 { z-index: 50; }
+        .opacity-40 { opacity: 0.4; }
+        .opacity-50 { opacity: 0.5; }
+        .cursor-not-allowed { cursor: not-allowed; }
+        .hidden { display: none; }
+        .transition { transition: all 0.2s ease; }
+        .transform { transform: translateZ(0); }
+        
+        /* Components */
+        .card { 
+            background: #FFFFFF; 
+            border: 1px solid #E2E8F0; 
+            border-radius: 1rem; 
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .section-label {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748B;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .node-base { 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 2px solid #CBD5E1; 
+            background: #FFFFFF; 
+            color: #334155; 
+            z-index: 20; 
+            position: absolute;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        
+        .node-active-fast { 
+            border-color: #3B82F6; 
+            background: #F0F9FF;
+            color: #0369A1; 
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: scale(1.03);
+        }
+        
+        .node-active-slow { 
+            border-color: #F59E0B; 
+            background: #FFFBEB; 
+            color: #92400E; 
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        }
+
+        .bg-grid-pattern {
+            background-image: linear-gradient(#F1F5F9 1px, transparent 1px),
+            linear-gradient(90deg, #F1F5F9 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .timeline-item {
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3B82F6;
+            border: 3px solid #DBEAFE;
+        }
+        .timeline-item.completed::before {
+            background: #10B981;
+            border-color: #D1FAE5;
+        }
+        .timeline-item.current::before {
+            background: #F59E0B;
+            border-color: #FEF3C7;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+
+        .phase-card { position: relative; overflow: hidden; }
+        .phase-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 4px;
+        }
+        .phase-1::after { background: linear-gradient(to bottom, #3B82F6, #2563EB); }
+        .phase-2::after { background: linear-gradient(to bottom, #8B5CF6, #7C3AED); }
+        .phase-3::after { background: linear-gradient(to bottom, #10B981, #059669); }
+
+        /* Nav link hover */
+        nav a:hover { color: #2563eb; }
+
+        /* Button hover */
+        button:hover:not(:disabled) { background-color: #1e293b; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #f1f5f9;">
+        <div class="max-w-7xl mx-auto px-6" style="height: 4rem; display: flex; align-items: center; justify-content: space-between;">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm" style="background: linear-gradient(to bottom right, #2563eb, #4f46e5);">α</div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 tracking-tight">Project <span class="text-blue-600">AlphaGate</span></h1>
+                    <div style="font-size: 10px;" class="text-slate-400 font-mono">Zero-Friction Asset Gateway</div>
+                </div>
+            </div>
+            <div class="flex gap-6 text-sm font-medium text-slate-500">
+                <a href="#vision" class="transition">Vision</a>
+                <a href="#problem" class="transition">Problem</a>
+                <a href="#benchmark" class="transition">Benchmark</a>
+                <a href="#strategy" class="transition">Strategy</a>
+                <a href="#timeline" class="transition">Timeline</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 space-y-20 bg-white">
+
+        <!-- 1. Hero / Vision Section -->
+        <section id="vision" class="text-center" style="display: flex; flex-direction: column; gap: 2.5rem;">
+            <div>
+                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100 uppercase tracking-wide">Strategic Initiative</span>
+                <h1 class="mt-6 text-5xl font-extrabold text-slate-900 tracking-tight leading-tight" style="font-size: clamp(2.5rem, 5vw, 3.75rem);">
+                    "Don't Bridge. <br><span class="text-transparent bg-clip-text bg-gradient-blue">Just Withdraw.</span>"
+                </h1>
+                <p class="mt-8 text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                    Kaia 생태계의 진입 장벽을 완전히 제거하는 <strong>Zero-Friction Gateway</strong>.<br>
+                    CEX 출금 = 즉시 입금. 브릿지 과정을 <strong>Invisible</strong>하게.
+                </p>
+            </div>
+
+            <!-- Executive Summary KPI Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-6xl mx-auto">
+                <div class="card p-5">
+                    <div class="section-label">Objective</div>
+                    <div class="text-lg font-bold text-slate-800">Major Asset</div>
+                    <div class="text-sm text-slate-500 mt-1">ETH/BTC 유동성 확보</div>
+                </div>
+                <div class="card p-5">
+                    <div class="section-label">Friction</div>
+                    <div class="text-3xl font-bold text-slate-800">4 → 1</div>
+                    <div class="text-sm text-slate-500 mt-1">Steps Reduced</div>
+                </div>
+                <div class="card p-5">
+                    <div class="section-label">Latency</div>
+                    <div class="text-3xl font-bold text-slate-800">~30s</div>
+                    <div class="text-sm text-slate-500 mt-1">vs 15-20분</div>
+                </div>
+                <div class="card p-5">
+                    <div class="section-label">Strategic Link</div>
+                    <div class="text-lg font-bold text-blue-600">AlphaSec</div>
+                    <div class="text-sm text-slate-500 mt-1">오더북 DEX 연동</div>
+                </div>
+                <div class="card p-5">
+                    <div class="section-label">Decision</div>
+                    <div class="text-lg font-bold text-pink-600">Partnership</div>
+                    <div class="text-sm text-slate-500 mt-1">fun.xyz 우선</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Problem: The Bridge Maze -->
+        <section id="problem" class="grid grid-cols-1 lg:grid-cols-2 gap-8" style="align-items: center;">
+            <div class="space-y-8">
+                <div>
+                    <span class="section-label text-red-500">The Pain Point</span>
+                    <h2 class="text-4xl font-bold text-slate-900 leading-tight">90%의 유저가<br>여기서 이탈합니다.</h2>
+                </div>
+                <p class="text-slate-600 text-lg leading-relaxed">
+                    외부 자금이 AlphaSec으로 들어오기 위해서는 <strong class="text-red-600">'죽음의 4단계'</strong>를 거쳐야 합니다. 
+                    브릿지 UI 개선으로는 부족합니다. <strong>브릿지 과정 자체를 보이지 않게</strong> 만들어야 합니다.
+                </p>
+                
+                <div class="space-y-3 pt-4">
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-red-50 border border-red-100">
+                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">1</div>
+                        <div>
+                            <span class="text-slate-800 font-semibold">CEX 출금 → 개인지갑</span>
+                            <span class="text-red-500 text-sm ml-2">↳ 이탈</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-red-50 border border-red-100">
+                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">2</div>
+                        <div>
+                            <span class="text-slate-800 font-semibold">브릿지 사이트 연결</span>
+                            <span class="text-red-500 text-sm ml-2">↳ 이탈</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-red-50 border border-red-100">
+                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">3</div>
+                        <div>
+                            <span class="text-slate-800 font-semibold">15-20분 대기 + 가스비 $10-50</span>
+                            <span class="text-red-500 text-sm ml-2">↳ 이탈</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-red-50 border border-red-100">
+                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">4</div>
+                        <div>
+                            <span class="text-slate-800 font-semibold">네트워크 전환 + 가스비 확보</span>
+                            <span class="text-red-500 text-sm ml-2">↳ 이탈</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-8">
+                <h3 class="text-sm font-bold text-slate-500 mb-6 text-center uppercase tracking-wide" style="letter-spacing: 0.05em;">User Retention Funnel</h3>
+                <div class="relative w-full h-80">
+                    <canvas id="frictionChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Benchmarks (with Numbers) -->
+        <section id="benchmark" class="space-y-12">
+            <div class="text-center">
+                <span class="section-label text-emerald-600">Proven Models</span>
+                <h2 class="text-4xl font-bold text-slate-900">이미 검증된 전략</h2>
+                <p class="text-slate-500 mt-3">실험적인 기술이 아닙니다. 글로벌 시장에서 검증된 모델을 따릅니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Abstract -->
+                <div class="card p-8" style="border-top: 4px solid #10b981;">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-emerald-50 rounded-xl" style="font-size: 1.875rem;">⚡</div>
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">급성장</span>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-900">Abstract Chain</h3>
+                    <div class="mt-3 text-3xl font-bold text-emerald-600">$40M+</div>
+                    <div class="text-sm text-slate-500">TVL · 1.3M+ 지갑</div>
+                    <p class="text-slate-600 mt-4 text-sm leading-relaxed">Global Wallet (Deposit Address) 도입으로 CEX 직입금 구현.</p>
+                </div>
+
+                <!-- Polymarket -->
+                <div class="card p-8" style="border-top: 4px solid #ec4899; background: rgba(253, 242, 248, 0.2);">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-pink-50 rounded-xl" style="font-size: 1.875rem;">🔮</div>
+                        <span class="px-3 py-1 bg-pink-100 text-pink-700 text-xs font-bold rounded-full">fun.xyz 통합</span>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-900">Polymarket</h3>
+                    <div class="mt-3 text-3xl font-bold text-pink-600">$9B+</div>
+                    <div class="text-sm text-slate-500">2024 연간 거래량</div>
+                    <p class="text-slate-600 mt-4 text-sm leading-relaxed">fun.xyz Checkout 통합으로 CEX 직입금 지원. 48배 성장 (월 66.5%).</p>
+                </div>
+
+                <!-- Hyperliquid -->
+                <div class="card p-8" style="border-top: 4px solid #3b82f6;">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-blue-50 rounded-xl" style="font-size: 1.875rem;">🌊</div>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">Market Leader</span>
+                    </div>
+                    <h3 class="font-bold text-xl text-slate-900">Hyperliquid</h3>
+                    <div class="mt-3 text-3xl font-bold text-blue-600">#1</div>
+                    <div class="text-sm text-slate-500">Perp DEX 시장 점유율</div>
+                    <p class="text-slate-600 mt-4 text-sm leading-relaxed">Native Bridge (Arbitrum 직입금)로 dYdX 추월. <strong>AlphaGate가 UX 우위 선점 가능.</strong></p>
+                </div>
+            </div>
+
+            <!-- Common Pattern -->
+            <div class="card p-6 bg-slate-50 border-slate-200 max-w-3xl mx-auto text-center">
+                <div class="text-sm font-bold text-slate-600 mb-3">공통 성공 패턴</div>
+                <div class="font-mono text-sm text-slate-700">
+                    CEX/외부 체인 → <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded font-bold">[Deposit Address]</span> → 즉시 잔고 반영
+                </div>
+                <div class="text-xs text-slate-500 mt-2">↑ Solver/Relayer가 선지급 후 정산</div>
+                <p class="mt-4 text-sm text-slate-600"><strong>핵심:</strong> "브릿지를 기다리는 시간"을 제거하면 온보딩 전환율 <span class="text-blue-600 font-bold">3-5배 상승</span></p>
+            </div>
+        </section>
+
+        <!-- 4. System Blueprint (Interactive) -->
+        <section class="card overflow-hidden border-slate-200">
+            <div class="p-8 flex justify-between items-center" style="border-bottom: 1px solid #f1f5f9; background: rgba(248, 250, 252, 0.8);">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">System Blueprint</h2>
+                    <p class="text-sm text-slate-500 mt-1">Fast Lane (UX) + Slow Lane (Settlement)</p>
+                </div>
+                <button onclick="runSimulation()" id="simBtn" class="px-8 py-3 bg-slate-900 text-white text-sm font-bold rounded-full shadow-md transition">
+                    ▶ Run Simulation
+                </button>
+            </div>
+            
+            <div class="p-12 relative overflow-hidden bg-white" style="height: 520px;">
+                <div class="absolute inset-0 bg-grid-pattern opacity-40"></div>
+
+                <div class="relative z-10 max-w-6xl mx-auto" style="height: 100%;">
+                    
+                    <div class="absolute text-xs font-mono text-blue-600 font-bold flex items-center gap-2 bg-white p-1 rounded" style="left: 0; top: 0;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; animation: pulse 2s infinite;"></span> FAST LANE (30초 이내)
+                    </div>
+                    <div class="absolute text-xs font-mono font-bold flex items-center gap-2 bg-white p-1 rounded" style="left: 0; bottom: 0; color: #d97706;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></span> SLOW LANE (15-30분, 유저 무관)
+                    </div>
+
+                    <!-- 1. Source -->
+                    <div id="node-cex" class="node-base w-44 p-4 rounded-2xl text-center" style="top: 48px; left: 0;">
+                        <div style="font-size: 1.875rem;" class="mb-2">🏦</div>
+                        <div class="font-bold text-sm text-slate-800">CEX 출금</div>
+                        <div class="text-xs text-slate-500 font-mono mt-1">Arbitrum</div>
+                    </div>
+
+                    <!-- 2. Gateway -->
+                    <div id="node-gateway" class="node-base w-44 p-4 rounded-2xl text-center" style="top: 48px; left: 220px;">
+                        <div style="font-size: 1.875rem;" class="mb-2">📡</div>
+                        <div class="font-bold text-sm text-slate-800">Gateway 감지</div>
+                        <div class="text-xs text-slate-500 font-mono mt-1">Deposit Address</div>
+                    </div>
+
+                    <!-- 3. Solver -->
+                    <div id="node-solver" class="node-base w-44 p-4 rounded-2xl text-center" style="top: 48px; left: 440px;">
+                        <div style="font-size: 1.875rem;" class="mb-2">⚡</div>
+                        <div class="font-bold text-sm text-slate-800">Solver 선지급</div>
+                        <div class="text-xs text-slate-500 font-mono mt-1">Treasury Pre-fill</div>
+                    </div>
+
+                    <!-- 4. User Wallet -->
+                    <div id="node-user" class="node-base p-4 rounded-2xl text-center border-green-400 shadow-md z-30" style="top: 48px; right: 0; width: 12rem;">
+                        <div style="font-size: 1.875rem;" class="mb-2">👤</div>
+                        <div class="font-bold text-sm text-green-700">AlphaSec L2 잔고</div>
+                        <div class="text-xs text-slate-500 font-mono mt-1">즉시 거래 가능</div>
+                        <div id="success-badge" class="hidden mt-2 px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">CREDITED</div>
+                    </div>
+
+                    <!-- 5. Stargate -->
+                    <div id="node-l1" class="node-base w-44 p-4 rounded-2xl text-center" style="bottom: 48px; left: 220px; border-color: #fde68a;">
+                        <div style="font-size: 1.875rem;" class="mb-2">🌉</div>
+                        <div class="font-bold text-sm" style="color: #b45309;">Stargate V2</div>
+                        <div class="text-xs text-slate-500 font-mono mt-1">Kaia L1 정산</div>
+                    </div>
+
+                    <!-- 6. Refill -->
+                    <div id="node-refill" class="node-base w-44 p-4 rounded-2xl text-center" style="bottom: 48px; right: 0; border-color: #a7f3d0;">
+                        <div style="font-size: 1.875rem;" class="mb-2">💰</div>
+                        <div class="font-bold text-sm text-emerald-700">Solver Refill</div>
+                        <div class="text-xs text-slate-500 font-mono mt-1">유동성 보충</div>
+                    </div>
+
+                    <!-- Connectors -->
+                    <div class="absolute" style="top: 100px; left: 176px; width: 44px; height: 2px; border-top: 2px dashed #cbd5e1;"></div>
+                    <div class="absolute" style="top: 100px; left: 396px; width: 44px; height: 2px; border-top: 2px dashed #cbd5e1;"></div>
+                    <div class="absolute" style="top: 100px; left: 616px; width: 84px; height: 2px; border-top: 2px dashed #93c5fd;"></div>
+                    <div class="absolute" style="top: 175px; left: 290px; height: 150px; width: 2px; border-left: 2px dashed #e2e8f0;"></div>
+                    
+                    <!-- Solver -> User 점선 연결 -->
+                    <div class="absolute" style="top: 100px; right: 192px; width: 60px; height: 2px; border-top: 2px dashed #93c5fd;"></div>
+                </div>
+
+                <!-- Console Log - Stargate V2와 Solver Refill 사이 (노드와 겹치지 않게) -->
+                <div class="absolute bg-slate-900 rounded-2xl p-4 font-mono text-xs shadow-2xl z-40 overflow-hidden" style="bottom: 32px; left: 420px; width: 300px; height: 160px; border: 1px solid #1e293b;">
+                    <div class="flex justify-between pb-2 mb-2" style="border-bottom: 1px solid #334155;">
+                        <span class="text-slate-400 font-bold" style="letter-spacing: 0.05em;">SYSTEM LOG</span>
+                        <div class="flex gap-2"><div style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></div><div style="width: 8px; height: 8px; border-radius: 50%; background: #eab308;"></div><div style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></div></div>
+                    </div>
+                    <div id="console-log" class="space-y-1 overflow-y-auto h-24 text-slate-300">
+                        <span class="text-slate-500">> System Ready...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Strategic Linkage: 오더북 DEX -->
+        <section id="strategy" class="space-y-12">
+            <div class="text-center">
+                <span class="section-label text-indigo-600">Strategic Linkage</span>
+                <h2 class="text-4xl font-bold text-slate-900">오더북 DEX 게이트웨이 연계</h2>
+                <p class="text-slate-500 mt-3">AlphaGate는 단독 프로덕트가 아닌, <strong>Kaia DeFi 전략의 핵심 인프라</strong>입니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Phase 1 -->
+                <div class="card p-6 phase-card phase-1">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">1</div>
+                        <div>
+                            <div class="font-bold text-slate-900">ETH Express</div>
+                            <div class="text-xs text-slate-500">Arbitrum → AlphaSec</div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-600 mb-4">CEX→DEX 직통 경로</div>
+                    <div class="text-xs text-blue-600 font-semibold">→ 초기 유동성 확보</div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="card p-6 phase-card phase-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold">2</div>
+                        <div>
+                            <div class="font-bold text-slate-900">Multi-chain</div>
+                            <div class="text-xs text-slate-500">+ Base, Optimism</div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-600 mb-4">여러 체인에서의 입금 지원</div>
+                    <div class="text-xs text-purple-600 font-semibold">→ 유입 경로 다변화</div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="card p-6 phase-card phase-3">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">3</div>
+                        <div>
+                            <div class="font-bold text-slate-900">Protocol Integration</div>
+                            <div class="text-xs text-slate-500">에코시스템 공용</div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-slate-600 mb-4">Gateway as Service</div>
+                    <div class="text-xs text-emerald-600 font-semibold">→ TVL 허브화</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Why Now -->
+        <section class="space-y-12">
+            <div class="text-center">
+                <span class="section-label text-orange-600">Market Timing</span>
+                <h2 class="text-4xl font-bold text-slate-900">Why Now?</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- External Trends -->
+                <div class="card p-8">
+                    <h3 class="font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
+                        <span class="text-xl">📈</span> 외부 환경
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-50 rounded-lg" style="border-left: 4px solid #3b82f6;">
+                            <div class="font-semibold text-slate-800">CEX → DeFi 가속화</div>
+                            <div class="text-sm text-slate-500 mt-1">FTX 이후 셀프 커스터디 수요 급증</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg" style="border-left: 4px solid #10b981;">
+                            <div class="font-semibold text-slate-800">인프라 성숙</div>
+                            <div class="text-sm text-slate-500 mt-1">Stargate V2, Across, Relay.link 등 Intent 기반 브릿지 안정화</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-lg" style="border-left: 4px solid #8b5cf6;">
+                            <div class="font-semibold text-slate-800">Chain Abstraction 부상</div>
+                            <div class="text-sm text-slate-500 mt-1">fun.xyz $47M 펀딩, Abstract Chain 급성장</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competition Gap -->
+                <div class="card p-8 bg-gradient-br-amber border-amber-200">
+                    <h3 class="font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
+                        <span class="text-xl">🎯</span> 경쟁 공백
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-4 bg-white rounded-lg border border-amber-100">
+                            <span class="text-slate-600">Kaia 에코시스템</span>
+                            <span class="font-bold text-amber-600">제대로 된 Gateway 없음</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-white rounded-lg border border-amber-100">
+                            <span class="text-slate-600">경쟁자</span>
+                            <span class="font-bold text-amber-600">선점자 부재</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-white rounded-lg border border-amber-100">
+                            <span class="text-slate-600">기회</span>
+                            <span class="font-bold text-blue-600">"Kaia의 관문" 선점</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-amber-100 rounded-lg text-center">
+                        <div class="font-bold text-amber-800">⏰ Timing is everything.</div>
+                        <div class="text-sm text-amber-700 mt-1">지금 움직이지 않으면, 다른 프로토콜이 이 포지션을 가져갑니다.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer class="bg-slate-50 py-12 text-center" style="border-top: 1px solid #f3f4f6;">
+        <p class="text-slate-400 text-sm font-medium italic">"The best time to build the gate was yesterday. The second best time is now."</p>
+        <p class="text-slate-300 text-xs mt-4">© 2025 AlphaSec Project Team. Confidential Strategy Deck.</p>
+    </footer>
+
+    <script>
+        // 1. Friction Chart
+        const ctx = document.getElementById('frictionChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['CEX 출금', '지갑 연결', '브릿지 실행', '가스비', '최종 완료'],
+                datasets: [
+                    {
+                        label: 'Legacy Bridge',
+                        data: [100, 60, 40, 25, 10],
+                        backgroundColor: '#E2E8F0',
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    },
+                    {
+                        label: 'AlphaGate',
+                        data: [100, 98, 97, 96, 95],
+                        backgroundColor: '#3B82F6',
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8 } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + '% 유저 잔존';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 100, 
+                        grid: { color: '#F1F5F9' }, 
+                        ticks: { 
+                            font: { size: 11 },
+                            callback: function(value) { return value + '%'; }
+                        } 
+                    },
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                }
+            }
+        });
+
+        // 2. Simulation Logic
+        function runSimulation() {
+            const btn = document.getElementById('simBtn');
+            const log = document.getElementById('console-log');
+            const badge = document.getElementById('success-badge');
+            
+            const nodes = {
+                cex: document.getElementById('node-cex'),
+                gateway: document.getElementById('node-gateway'),
+                solver: document.getElementById('node-solver'),
+                user: document.getElementById('node-user'),
+                l1: document.getElementById('node-l1'),
+                refill: document.getElementById('node-refill')
+            };
+
+            // Reset
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            badge.style.display = 'none';
+            log.innerHTML = '<span style="color: #2563eb;">> Init AlphaGate Protocol...</span>';
+            
+            Object.values(nodes).forEach(n => {
+                n.classList.remove('node-active-fast', 'node-active-slow');
+                n.style.opacity = '1';
+            });
+
+            const addLog = (msg) => {
+                log.innerHTML += '<div>' + msg + '</div>';
+                log.scrollTop = log.scrollHeight;
+            };
+
+            // --- Fast Lane ---
+            setTimeout(() => {
+                nodes.cex.classList.add('node-active-fast');
+                addLog('> [User] CEX에서 ETH 출금');
+            }, 500);
+
+            setTimeout(() => {
+                nodes.cex.classList.remove('node-active-fast');
+                nodes.gateway.classList.add('node-active-fast');
+                addLog('> [Gateway] 입금 감지');
+            }, 1500);
+
+            setTimeout(() => {
+                nodes.gateway.classList.remove('node-active-fast');
+                nodes.solver.classList.add('node-active-fast');
+                addLog('> [Solver] <span style="color: #2563eb;">선지급 실행중...</span>');
+            }, 2500);
+
+            setTimeout(() => {
+                nodes.solver.classList.remove('node-active-fast');
+                nodes.user.classList.add('node-active-fast');
+                badge.style.display = 'inline-block';
+                addLog('> [AlphaSec] ⚡ <span style="color: #16a34a; font-weight: bold;">잔고 반영 완료!</span> (UX Complete)');
+            }, 3500);
+
+            // --- Slow Lane ---
+            setTimeout(() => {
+                nodes.user.classList.remove('node-active-fast');
+                nodes.user.style.opacity = '0.6';
+                addLog('> [System] 비동기 정산 시작...');
+                nodes.gateway.classList.add('node-active-slow');
+            }, 5000);
+
+            setTimeout(() => {
+                nodes.gateway.classList.remove('node-active-slow');
+                nodes.l1.classList.add('node-active-slow');
+                addLog('> [Stargate] Kaia L1 브릿징...');
+            }, 6500);
+
+            setTimeout(() => {
+                nodes.l1.classList.remove('node-active-slow');
+                nodes.refill.classList.add('node-active-slow');
+                addLog('> [Refill] <span style="color: #059669;">Solver 유동성 보충 완료</span>');
+                
+                setTimeout(() => {
+                    nodes.refill.classList.remove('node-active-slow');
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                }, 1500);
+            }, 8000);
+        }
+    </script>
+</body>
+</html>
